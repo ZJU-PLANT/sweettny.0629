@@ -1,0 +1,53 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+plt.rcParams['font.sans-serif'] = ['simsun','times new roman']#字体
+
+
+def add_text(x, y, data, fontsize=12):
+    for x0, y0, data0 in zip(x, y, data):
+        axs[1].text(x0, y0, round(data0, 1), rotation=90)
+
+df = pd.read_csv(r'C:/Users/swt/Desktop/python/salary.csv')
+person = np.array(df.person)
+salary1 = np.array(df.Salary1)
+salary2 = np.array(df.Salary2)
+salary3 = np.array(df.Salary3)
+index = np.arange(len(person))
+width = 0.4
+#subplots函数创建了对比图，左边显示了正常的堆积图，右边则显示了百分比堆积图，这里的subplots函数，返回对象有两个，
+# 前者fig相当于画布，而后者axs相当于在画布上绘制的元素，因此，我们这里是对绘制的元素操作，所以后续都是在ax上展开。
+fig, axs = plt.subplots(1, 2, figsize=(10, 5))
+#下面是画左边图，堆积的要点在于绘制时候的bottom关键字，这决定了柱状图的绘制起点，因此第二段的bottom是第一段的数值，而第三段则为第一、二段相加
+axs[0].bar(index, salary1, width=width, label='salary1')
+axs[0].bar(index, salary2, width=width, bottom=salary1, label='salary2')
+axs[0].bar(index, salary3, width=width, bottom=salary2 + salary1, label='salary3')
+axs[0].set_ylim(0, 100)
+axs[0].set_xticks(index)
+axs[0].set_xticklabels(person, rotation=0)
+axs[0].legend(loc='upper left', shadow=True)
+
+sum = salary1 + salary2 + salary3
+percentage1 = salary1 / sum
+percentage2 = salary2 / sum
+percentage3 = salary3 / sum
+
+axs[1].bar(index, percentage1, width=width, label='salary1')
+axs[1].bar(index, percentage2, width=width, bottom=percentage1, label='salary2')
+axs[1].bar(index, percentage3, width=width,
+           bottom=percentage1 + percentage2, label='salary3')
+axs[1].set_ylim(0, 1)
+axs[1].set_xticks(index)
+axs[1].set_xticklabels(person, rotation=0)
+axs[1].legend(loc='upper left', shadow=True)#不加则不显示标签
+y1 = percentage1/2
+y2 = percentage1 + percentage2/2
+y3 = sum - percentage3/2
+
+add_text(index-width/2, y1, percentage1)
+add_text(index-width/2, y2, percentage2)
+#add_text(index-width/2, y3, percentage3)
+#plt.xlabel('Person')
+#plt.ylabel('Salary')只能显示右图x，y轴名字
+plt.show()
